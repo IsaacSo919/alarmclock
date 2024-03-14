@@ -1,49 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context =".MainActivity" >
-
+    android:layout_height="match_parent">
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/pagedescription"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/selectedTime"
-        android:layout_marginTop="200dp"
-        android:baselineAligned="false"
-        android:text="08:45PM"
-        android:textAlignment="center"
-        android:textSize="50dp"></TextView>
+        android:text="Your Alarms"
+        android:layout_marginTop="20dp"
+        android:textSize="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-    <Button
-        android:id="@+id/setAlarmButton"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginHorizontal="20dp"
-        android:text="Set_Alarm"
-        android:textSize="26dp"></Button>
+    </TextView>
 
-    <Button
-        android:id="@+id/selectTimeButton"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginHorizontal="20dp"
-        android:text="Select Time"
-        android:textSize="26dp"></Button>
+    <ImageView
+        android:id="@+id/createalarm"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_add"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-    <Button
-        android:id="@+id/CancelAlarmButton"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginHorizontal="20dp"
-        android:text="Cancel Alarm"
-        android:textSize="26dp"></Button>
+    </ImageView>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycleralarms"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pagedescription"
+        app:layout_constraintBottom_toTopOf="@+id/createalarm">
 
+    </androidx.recyclerview.widget.RecyclerView>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

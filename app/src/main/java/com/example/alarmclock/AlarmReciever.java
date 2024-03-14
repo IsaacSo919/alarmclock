@@ -16,7 +16,7 @@ public class AlarmReciever extends BroadcastReceiver {
         Intent intent1 =new Intent(context,DestinationActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-        PendingIntent pendingIntent =PendingIntent.getActivity(context,0,intent1,0);
+        PendingIntent pendingIntent =PendingIntent.getActivity(context,0,intent1, PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context,"channel")
                 .setSmallIcon(R.drawable.ic_launcher_background)
@@ -25,7 +25,6 @@ public class AlarmReciever extends BroadcastReceiver {
                 .setAutoCancel(true)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setPriority(Notification.PRIORITY_HIGH)
-
                 .setContentIntent(pendingIntent);
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
