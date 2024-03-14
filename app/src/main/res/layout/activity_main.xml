@@ -26,15 +26,16 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
     </ImageView>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycleralarms"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="20dp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/createalarm"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pagedescription"
-        app:layout_constraintBottom_toTopOf="@+id/createalarm">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pagedescription">
 
     </androidx.recyclerview.widget.RecyclerView>
 
