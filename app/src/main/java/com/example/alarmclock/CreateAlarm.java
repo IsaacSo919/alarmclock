@@ -31,11 +31,13 @@ public class CreateAlarm extends AppCompatActivity {
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
 
-    private MainActivity mainActivity;
+
 /** attributes **/
 
 
-    /** constuctor **/
+    /**
+     * constuctor
+     **/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,7 +74,6 @@ public class CreateAlarm extends AppCompatActivity {
                 saveAlarm();
             }
         });
-
 
 
 //        binding.CancelAlarmButton.setOnClickListener(new View.OnClickListener() {
@@ -154,28 +155,23 @@ public class CreateAlarm extends AppCompatActivity {
             newAlarm.setMinute(minutestring);
 
             Intent intent = new Intent();
-            intent.putExtra("newAlarm",newAlarm);
-            setResult(RESULT_OK,intent);
-            finish();
-            mainActivity.alarms.add(newAlarm);
-            mainActivity.alarmadadapter.notifyDataSetChanged();
+            intent.putExtra("newAlarm", newAlarm);
+            setResult(RESULT_OK, intent);
+            MainActivity.alarms.add(newAlarm);
+
+            alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            // line 110 sets the alarm with the content in the calender
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+            Toast.makeText(this, "Finish setting an Alarm", Toast.LENGTH_SHORT).show();
+            onBackPressed();
+
 
         }
-    }}
+    }
 
-//    private void cancelAlarm() {
-//        Intent intent = new Intent(this, AlarmReciever.class);
-//        pendingIntent = PendingIntent.getBroadcast(this,0,intent,PendingIntent.FLAG_IMMUTABLE);
-//        /** "pendingIntent", this should be referencing to the pendingIntent in setAlarm **/
-//        if (alarmManager == null) {
-//            alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//        }
-//        // For situation that if the user close the app, it would also be null;
-//        alarmManager.cancel(pendingIntent);
-//        Toast.makeText(this, "Canceled the alarm", Toast.LENGTH_SHORT).show();
-//    }
-/*
-    private void createNotificationChannel( {
+
+    private void createNotificationChannel() {
         Calendar calendar = Calendar.getInstance();
         long timeInMillis = calendar.getTimeInMillis();
         System.out.println(timeInMillis);
@@ -192,7 +188,7 @@ public class CreateAlarm extends AppCompatActivity {
              NotificationChannel(String id, CharSequence name, int importance)
              Creates a notification channel.
              **/
-        /*
+
             int importance = NotificationManager.IMPORTANCE_HIGH;// Priority 4 means the notification will pop up when user is using the phone
             NotificationChannel channel = new NotificationChannel("channel", name, importance);// id of the channel is same as the one in AlarmReciever.java
             channel.setDescription(description);
@@ -200,10 +196,11 @@ public class CreateAlarm extends AppCompatActivity {
              * Return the handle to a system-level service by name. The class of the returned object
              varies by the requested name.https://developer.android.com/reference/android/content/Context#getSystemService(java.lang.String)
              **/
-/*
+
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel)
+            notificationManager.createNotificationChannel(channel);
 
         }
     }
-}*/
+}
+
