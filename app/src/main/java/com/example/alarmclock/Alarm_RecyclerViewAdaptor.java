@@ -1,5 +1,7 @@
 package com.example.alarmclock;
 
+import static com.example.alarmclock.MainActivity.alarmAdapter;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class Alarm_RecyclerViewAdaptor extends RecyclerView.Adapter<Alarm_RecyclerViewAdaptor.MyViewHolder> {
     List<Alarm> alarms;
@@ -31,9 +34,8 @@ public class Alarm_RecyclerViewAdaptor extends RecyclerView.Adapter<Alarm_Recycl
     @Override
     public Alarm_RecyclerViewAdaptor.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         //inflate the layout giving the look of each of the rows
-        Alarm_RecyclerViewAdaptor alarmAdaptor = new Alarm_RecyclerViewAdaptor(alarms);
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_row,parent,false);
-        return new MyViewHolder(view,alarmAdaptor);
+        return new MyViewHolder(view,alarmAdapter);
     }
 
     @Override                                                               //(inner class)

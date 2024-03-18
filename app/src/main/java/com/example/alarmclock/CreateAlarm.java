@@ -158,12 +158,13 @@ public class CreateAlarm extends AppCompatActivity {
             intent.putExtra("newAlarm", newAlarm);
             setResult(RESULT_OK, intent);
             MainActivity.alarms.add(newAlarm);
+            MainActivity.alarmAdapter.notifyDataSetChanged();
 
             alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
             // line 110 sets the alarm with the content in the calender
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-            Toast.makeText(this, "Finish setting an Alarm", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Finished setting an Alarm", Toast.LENGTH_SHORT).show();
             onBackPressed();
 
 

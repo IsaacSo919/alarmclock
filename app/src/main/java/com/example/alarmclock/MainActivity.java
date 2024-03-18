@@ -18,11 +18,9 @@ public class MainActivity extends AppCompatActivity {
     /** list of alarms**/
     public static ArrayList <Alarm> alarms = new ArrayList<>();
 
-    private static Alarm_RecyclerViewAdaptor adapter;
-
     private RecyclerView recyclerView;
 
-    private static Alarm_RecyclerViewAdaptor alarmAdaptor;
+    public static Alarm_RecyclerViewAdaptor alarmAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +36,9 @@ public class MainActivity extends AppCompatActivity {
         // findViews
         recyclerView = findViewById(R.id.myRecyclerView);
         ImageView createalarm = findViewById(R.id.createalarm);
-        alarmAdaptor = new Alarm_RecyclerViewAdaptor(alarms);
+        alarmAdapter = new Alarm_RecyclerViewAdaptor(alarms);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(alarmAdaptor);
+        recyclerView.setAdapter(alarmAdapter);
         createalarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
