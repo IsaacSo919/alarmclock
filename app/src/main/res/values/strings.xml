@@ -45,4 +45,5 @@
     </string>
     <string name="title_activity_alarmclock">alarmclock</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="example_text">This is an example text</string>
 </resources>

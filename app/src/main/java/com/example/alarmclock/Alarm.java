@@ -1,179 +1,44 @@
 package com.example.alarmclock;
 
+import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.ActionBar;
-import android.app.AlarmManager;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.example.alarmclock.databinding.ActivityMainBinding;
-import com.google.android.material.timepicker.MaterialTimePicker;
-import com.google.android.material.timepicker.TimeFormat;
-
-import java.util.Calendar;
-
-public class Alarm extends AppCompatActivity {
-    private ActivityMainBinding binding;
-    private MaterialTimePicker picker;
-    private Calendar calendar;
-
-    private AlarmManager alarmManager;
-    private PendingIntent pendingIntent;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        /**--------------------------------------------------------**/
-//        binding = ActivityMainBinding.inflate(getLayoutInflater());
-//        setContentView(binding.getRoot());
-
-        /**--------------------------------------------------------**/
-        setContentView(R.layout.activity_create_alarm);
+public class Alarm implements Serializable {
+    private String hour;
+    private String minute;
+    private int id;
+    private static AtomicInteger ID_GENERATOR = new AtomicInteger(1000);
 
 
-        createNotificationChannel();
-        final Button selectTimeButton = findViewById(R.id.selectTimeButton);
-        final Button saveButton = findViewById(R.id.saveButton);
-        final Button cancelButton = findViewById(R.id.cancelButton);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
-        selectTimeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTimePicker();
-            }
+    public Alarm(String hour, String minute) {
+        this.id = ID_GENERATOR.getAndIncrement();;
+        this.hour = hour;
+        this.minute = minute;
+    }
 
-        });
-
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveAlarm();
-            }
-        });
-
-
-
-//        binding.CancelAlarmButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                cancelAlarm();
-//            }
-//        });
-
+    public Alarm() {
 
     }
 
-
-    /**
-     * An Intent is a messaging object you can use to request an action from another app component.
-     * there are three fundamental use cases:
-     * Starting a service
-     * Starting an activity
-     * Delivering a broadcast(I am using this in the Set Alarm)
-     **/
-
-
-    private void showTimePicker() {
-        picker = new MaterialTimePicker.Builder().setTimeFormat(TimeFormat.CLOCK_12H).setHour(12).setMinute(0).setTitleText("Select Time").build();
-        //MaterialTimePicker.Builder() is used to create MaterialTimePicker instances.
-        //MaterialTimePicker is A Dialog with a clock display and a clock face to choose the time.
-        picker.show(getSupportFragmentManager(), "channel");
-        TextView selectedTime = findViewById(R.id.selectedTime);
-        picker.addOnPositiveButtonClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (picker.getHour() > 12) {
-                    String hour = String.valueOf(picker.getHour());
-                    String min = String.valueOf(picker.getMinute());
-                    selectedTime.setText(
-                            String.format("%02d", (picker.getHour() - 12)) + " : " + String.format("%02d", picker.getMinute()) + " PM");
-                } else if (picker.getHour() == 12) {
-                    selectedTime.setText(
-                            String.format("%02d", (picker.getHour())) + " : " + String.format("%02d", picker.getMinute()) + " PM");
-
-                } else {
-
-                    selectedTime.setText(picker.getHour() + ":" + picker.getMinute() + "AM");
-
-                }
-                /**The calander will point to the time that is being selected **/
-                calendar = Calendar.getInstance();
-                calendar.set(Calendar.HOUR_OF_DAY, picker.getHour());
-                calendar.set(Calendar.MINUTE, picker.getMinute());
-                calendar.set(Calendar.SECOND, 0);
-                calendar.set(Calendar.MILLISECOND, 0);
-
-            }
-        });
+    public void setHour(String hour) {
+        this.hour = hour;
     }
 
-    private void saveAlarm() {
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, AlarmReciever.class);
-        pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-        Toast.makeText(this, "Finish setting an Alarm", Toast.LENGTH_SHORT).show();
-
-
+    public void setMinute(String minute) {
+        this.minute = minute;
     }
 
-//    private void cancelAlarm() {
-//        Intent intent = new Intent(this, AlarmReciever.class);
-//        pendingIntent = PendingIntent.getBroadcast(this,0,intent,PendingIntent.FLAG_IMMUTABLE);
-//        /** "pendingIntent", this should be referencing to the pendingIntent in setAlarm **/
-//        if (alarmManager == null) {
-//            alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//        }
-//        // For situation that if the user close the app, it would also be null;
-//        alarmManager.cancel(pendingIntent);
-//        Toast.makeText(this, "Canceled the alarm", Toast.LENGTH_SHORT).show();
-//    }
-
-    private void createNotificationChannel() {
-        Calendar calendar = Calendar.getInstance();
-        long timeInMillis = calendar.getTimeInMillis();
-        System.out.println(timeInMillis);
-        //If your android is on Oreo, create this
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            //fields
-            CharSequence name = "Alarm clock notification";
-            String description = "Wake up!";
-            /**
-             the NotificationManager.IMPORTANCE_HIGH provides an int that when you call the
-             NotificationChannel.
-
-             Public constructors of the NotificationChannel:
-             NotificationChannel(String id, CharSequence name, int importance)
-             Creates a notification channel.
-             **/
-            int importance = NotificationManager.IMPORTANCE_HIGH;// Priority 4 means the notification will pop up when user is using the phone
-            NotificationChannel channel = new NotificationChannel("channel", name, importance);// id of the channel is same as the one in AlarmReciever.java
-            channel.setDescription(description);
-            /**
-             * Return the handle to a system-level service by name. The class of the returned object
-             varies by the requested name.https://developer.android.com/reference/android/content/Context#getSystemService(java.lang.String)
-             **/
-
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-
-        }
+    public String getHour() {
+        return hour;
     }
+
+    public String getMinute() {
+        return minute;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+
 }
