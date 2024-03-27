@@ -20,6 +20,11 @@ public class Alarm implements Serializable {
 
     }
 
+    @Override
+    public String toString() {
+        return hour + " : "+ minute;
+    }
+
     public void setHour(String hour) {
         this.hour = hour;
     }
