@@ -1,7 +1,7 @@
 package com.example.alarmclock;
 
-
 import androidx.appcompat.app.AppCompatActivity;
+import static com.example.alarmclock.CreateAlarm.*;
 
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
@@ -17,91 +17,62 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.alarmclock.databinding.ActivityMainBinding;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 
 import java.util.Calendar;
 
-public class CreateAlarm extends AppCompatActivity {
-    private ActivityMainBinding binding;
+public class AlarmsDetails extends AppCompatActivity {
     private MaterialTimePicker picker;
     private Calendar calendar;
 
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
 
-
-/** attributes **/
-
-
-    /**
-     * constuctor
-     **/
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        /**--------------------------------------------------------**/
-//        binding = ActivityMainBinding.inflate(getLayoutInflater());
-//        setContentView(binding.getRoot());
-
-        /**--------------------------------------------------------**/
-        setContentView(R.layout.activity_create_alarm);
-
-
-        final Button selectTimeButton = findViewById(R.id.selectTimeButton);
-        final Button saveButton = findViewById(R.id.saveButton);
-        final Button cancelButton = findViewById(R.id.cancelButton);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
+        setContentView(R.layout.activity_alarms_details);
+        Intent intent = getIntent();
+        if (intent != null) {
+            int position = intent.getIntExtra("alarm_position", -1);
+            if (position != -1) {
+                Alarm alarm = MainActivity.alarms.get(position);
+                // Set details
+                TextView datetextview = findViewById(R.id.editselectedTime);
+                datetextview.setText(alarm.toString());
+            }
+        }
+        Button cancelbutton = findViewById(R.id.editcancelButton);
+        cancelbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBackPressed();
             }
         });
-        selectTimeButton.setOnClickListener(new View.OnClickListener() {
+        Button selecttimed = findViewById(R.id.editselectTimeButton);
+        selecttimed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showTimePicker();
             }
-
         });
 
-        saveButton.setOnClickListener(new View.OnClickListener() {
+        Button saveeditedalarm = findViewById(R.id.editsaveButton);
+        saveeditedalarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 saveAlarm();
             }
         });
-
-
-//        binding.CancelAlarmButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                cancelAlarm();
-//            }
-//        });
-
-
     }
-
-
-    /**
-     * An Intent is a messaging object you can use to request an action from another app component.
-     * there are three fundamental use cases:
-     * Starting a service
-     * Starting an activity
-     * Delivering a broadcast(I am using this in the Set Alarm)
-     **/
-
 
     public void showTimePicker() {
         picker = new MaterialTimePicker.Builder().setTimeFormat(TimeFormat.CLOCK_12H).setHour(12).setMinute(0).setTitleText("Select Time").build();
         //MaterialTimePicker.Builder() is used to create MaterialTimePicker instances.
         //MaterialTimePicker is A Dialog with a clock display and a clock face to choose the time.
         picker.show(getSupportFragmentManager(), "channel");
-        TextView selectedTime = findViewById(R.id.selectedTime);
+        TextView selectedTime = findViewById(R.id.editselectedTime);
         picker.addOnPositiveButtonClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,44 +103,56 @@ public class CreateAlarm extends AppCompatActivity {
 
     private void saveAlarm() {
         if (calendar != null) {
-            /** update attributes**/
+            //Gettting hour and minute from calendar class
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
             int minute = calendar.get(Calendar.MINUTE);
-            String hourstring = String.format("%02d",hour);
-            String minutestring = String.format("%02d",minute);
+            String hourString = String.format("%02d", hour);
+            String minuteString = String.format("%02d", minute);
 
-            /**
-             * SharedPreference
-             * **/
-            SharedPreferences sharedPreferences = getSharedPreferences("alarm", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
+            // Retrieve the position of the alarm being edited
+            int position = getIntent().getIntExtra("alarm_position", -1);
+            if (position != -1) {
+                // Obtain the position of the alarm to be edited
+                Alarm editedAlarm = MainActivity.alarms.get(position);
 
+                // Update the attributes of the existing alarm
+                editedAlarm.setHour(hourString);
+                editedAlarm.setMinute(minuteString);
 
-            String alarmkey = "alarm_" + System.currentTimeMillis();
-            editor.putString(alarmkey + "_hour_", hourstring);
-            editor.putString(alarmkey + "_minute", minutestring);
+                // Update the alarm in SharedPreferences
+                SharedPreferences sharedPreferences = getSharedPreferences("alarm", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                String alarmKey = "alarm_" + System.currentTimeMillis();
+                editor.putString(alarmKey + "_hour_", hourString);
+                editor.putString(alarmKey + "_minute", minuteString);
+                editor.apply();
 
-            editor.apply();
-            Alarm newAlarm = new Alarm();
-            newAlarm.setHour(hourstring);
-            newAlarm.setMinute(minutestring);
+                // Create a new Intent for AlarmReceiver
+                Intent intent = new Intent(this, AlarmReciever.class);
 
-            Intent intent = new Intent();
-            intent.putExtra("newAlarm", newAlarm);
-            setResult(RESULT_OK, intent);
-            MainActivity.alarms.add(newAlarm);
-            MainActivity.alarmAdapter.notifyDataSetChanged();
+                // Create a PendingIntent with the existing alarm's position
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, position, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-            // line 110 sets the alarm with the content in the calender
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-            Toast.makeText(this, "Finished setting an Alarm", Toast.LENGTH_SHORT).show();
-            onBackPressed();
+                // Get the AlarmManager instance
+                AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
+                // Cancel the existing alarm
+                alarmManager.cancel(pendingIntent);
 
+                // Set the new alarm with updated time
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+
+                // Notify MainActivity of the change
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("editedAlarm", editedAlarm);
+                setResult(RESULT_OK, resultIntent);
+
+                // Finish activity
+                onBackPressed();
+            }
         }
     }
+
 
 
     private void createNotificationChannel() {
@@ -202,6 +185,6 @@ public class CreateAlarm extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
 
         }
+
     }
 }
-
